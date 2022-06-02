@@ -1,0 +1,112 @@
+in pom file add this library:
+
+<!-- https://mvnrepository.com/artifact/com.google.auth/google-auth-library-oauth2-http -->
+<dependency>
+    <groupId>com.google.auth</groupId>
+    <artifactId>google-auth-library-oauth2-http</artifactId>
+    <version>1.6.0</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.google.api.client/google-api-client-googleapis -->
+<dependency>
+    <groupId>com.google.api.client</groupId>
+    <artifactId>google-api-client-googleapis</artifactId>
+    <version>1.4.0-alpha</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client -->
+<dependency>
+    <groupId>com.google.oauth-client</groupId>
+    <artifactId>google-oauth-client</artifactId>
+    <version>1.31.4</version>
+</dependency>
+
+<dependency>
+    <groupId>com.google.api-client</groupId>
+    <artifactId>google-api-client</artifactId>
+    <version>1.33.0</version>
+</dependency>
+
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt</artifactId>
+    <version>0.7.0</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-core</artifactId>
+    <version>2.13.0</version>
+</dependency>
+
+
+
+
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson.JacksonFactory;
+
+
+
+@GetMapping("/logingoogle/{tokenString}") // http://localhost:9001/userDetails/logingoogle/{token}
+	public String getPayload(@PathVariable("tokenString") String tokenString) throws Exception {
+		try {
+		System.out.println("-----------------");
+		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+				.setAudience(Collections
+						.singletonList("647078895687-ob56ckhh2571v7uhlnd53e0lub1u0crq.apps.googleusercontent.com"))
+				.build();
+		//tokenString = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjM4ZjM4ODM0NjhmYzY1OWFiYjQ0NzVmMzYzMTNkMjI1ODVjMmQ3Y2EiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNjQ3MDc4ODk1Njg3LW9iNTZja2hoMjU3MXY3dWhsbmQ1M2UwbHViMXUwY3JxLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNjQ3MDc4ODk1Njg3LW9iNTZja2hoMjU3MXY3dWhsbmQ1M2UwbHViMXUwY3JxLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE3OTk0MDMxODAyNDk4MTg4MDMxIiwiZW1haWwiOiJpbnNjYXBlYXBwbGljYXRpb24xQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiNHIzSlhCcFRKWUhSbVl6YXN5NkItUSIsIm5hbWUiOiJpbnNjYXBlIGFwcGxpY2F0aW9uIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBVFhBSnlsNGkxYXJMeEo5b1cwSzZqd3JoRjBDUGZTUFNkUDBhcVlqWnFhPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6Imluc2NhcGUiLCJmYW1pbHlfbmFtZSI6ImFwcGxpY2F0aW9uIiwibG9jYWxlIjoiZW4iLCJpYXQiOjE2NTQwODQ3MTMsImV4cCI6MTY1NDA4ODMxMywianRpIjoiOGRmMzA4OGU0Y2IyZDczNTA1YmZhYzkwODFmOTdjNWFlMTMzOTk4MyJ9.hRiLFYwFAzrwOQ0_ub7hyTE0uDZYGD8aCWRPuWyrzwG8oGPM8dd54VWJqsLfbZ_m8CLicEsxlBVjaC5Bn8fyvwk0ZgPPgceZsSYIaMstbg6aiMfDKMMDhC9XKQn2paWBbIMIVKoT6qNcvb2Tt6lXhu3DH_zQ6PQtN1KXb02AXXA7dRY8eL16gRpHR52TyFZhC8aRxe1CyHHjN6cUlJx_gTZKb37CUJACm0m37vv1LdhymXD_3CsUdorEUBkh8poE3j-6z2IFh5THCHU4caPVbwhngUllFbrzbuIILLSnhaXRUxvL324y0YjX3-Ys6TvGA3zIEAqmcBZsTgBQE-Oe6w";
+		GoogleIdToken idToken = verifier.verify(tokenString);
+		System.out.println("=======================");
+
+		if (idToken != null) {
+			Payload payload = idToken.getPayload();
+			String email = ((com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload) payload).getEmail();
+			boolean emailVerified = Boolean.valueOf(
+					((com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload) payload).getEmailVerified());
+			String name = (String) payload.get("name");
+			// String givenName = (String) payload.get("given_name");
+			
+			System.out.println("email:-" + email);
+			System.out.println("name:-" + name);
+			String user = userRepository.googleSignIn(email);
+			
+			
+			return user;
+		}
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something not right");
+		 //return "0";
+		}
+		catch(Exception e) {
+			return "0";
+		}
+		
+	}
+	
+	
+	//https://oauth2.googleapis.com/tokeninfo?id_token=+"tokenString"
+  
+  
+  
+  
+  repository layer
+  
+  public String googleSignIn(String email) {
+		UserDetails user = new UserDetails(email);
+		DynamoDBScanExpression dynamoDBScanExpression = new DynamoDBScanExpression().withProjectionExpression("email");
+		List<UserDetails> emailList = (List<UserDetails>) dynamoDBMapper.scan(UserDetails.class,
+				dynamoDBScanExpression);
+		for (UserDetails email1 : emailList) {
+			if (user.getEmail().equals(email1.getEmail())) {
+				return "Email already exists";
+			}
+		}
+			
+			dynamoDBMapper.save(user);
+			return "signed in";
+	}
